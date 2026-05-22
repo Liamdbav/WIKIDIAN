@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wikidian</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      width: 280px;
+      padding: 16px;
+      margin: 0;
+      background: #1e1e2e;
+      color: #cdd6f4;
+    }
+    h1 {
+      font-size: 1rem;
+      margin: 0 0 12px;
+      color: #cba6f7;
+    }
+    label {
+      display: block;
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+      color: #a6adc8;
+    }
+    input[type="password"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #45475a;
+      background: #313244;
+      color: #cdd6f4;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    button {
+      width: 100%;
+      padding: 7px;
+      border-radius: 6px;
+      border: none;
+      background: #cba6f7;
+      color: #1e1e2e;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    button:hover { background: #b4befe; }
+    #status {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      min-height: 1rem;
+      color: #a6e3a1;
+    }
+  </style>
+</head>
+<body>
+  <h1>Wikidian</h1>
+  <label for="apiKey">Obsidian REST API key</label>
+  <input type="password" id="apiKey" placeholder="Paste your API key…" />
+  <button id="save">Save</button>
+  <div id="status"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,38 +1,46 @@
 # Wikidian
 
-A Chromium Manifest V3 extension that captures Wikipedia articles you visit and
-saves them as Markdown notes in an [Obsidian](https://obsidian.md) vault via the
-[Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) plugin.
+Extension Chromium Manifest V3 qui capture les articles Wikipedia que tu visites
+et les sauvegarde comme notes Markdown dans un vault [Obsidian](https://obsidian.md),
+via le plugin [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api).
 
-## How it works
+## Comment ça fonctionne
 
-1. You browse a Wikipedia article (`*.wikipedia.org/wiki/*`).
-2. The content script collects the article title and body.
-3. The background service worker sends the Markdown to Obsidian's REST API
-   (`http://127.0.0.1:27123`).
-4. A new note appears in your vault.
+1. Tu cliques sur **"Capturer cette page"** depuis n'importe quel article Wikipedia.
+2. Le content script extrait le titre et convertit le corps de l'article en Markdown structuré (titres, liens, gras/italique) grâce à [Turndown](https://github.com/mixmark-io/turndown).
+3. Le service worker envoie la note à l'API Obsidian locale (`http://127.0.0.1:27123`).
+4. La note apparaît dans ton vault sous `Wikipedia/{Titre}.md`.
 
-## Prerequisites
+## Prérequis
 
-- [Obsidian](https://obsidian.md) desktop app running.
-- **Local REST API** plugin installed, enabled, and its API key copied.
-- Chrome / Chromium (any modern version supporting MV3).
+- [Obsidian](https://obsidian.md) ouvert sur le bureau.
+- Plugin **Local REST API** installé, activé, et sa clé API copiée.
+- Chrome ou Chromium (toute version récente supportant MV3).
 
-## Load the extension in Chrome
+## Charger l'extension dans Chrome
 
-1. Open `chrome://extensions`.
-2. Enable **Developer mode** (top-right toggle).
-3. Click **Load unpacked** and select this folder.
-4. Click the Wikidian toolbar icon, paste your Obsidian REST API key, and save.
+1. Ouvre `chrome://extensions`.
+2. Active le **Mode développeur** (interrupteur en haut à droite).
+3. Clique sur **Charger l'extension non empaquetée** et sélectionne ce dossier.
+4. Clique sur l'icône Wikidian dans la barre d'outils, colle ta clé API Obsidian et sauvegarde.
 
-## Project structure
+## Structure du projet
 
 ```
 wikidian/
-├── manifest.json   — MV3 manifest
-├── background.js   — service worker (API calls to Obsidian)
-├── content.js      — injected into Wikipedia pages
-├── popup.html/js   — toolbar popup (API key storage)
-├── icons/          — add icon16/48/128.png here
-└── CLAUDE.md       — dev context & notes
+├── manifest.json     — manifest MV3
+├── background.js     — service worker (appels API vers Obsidian)
+├── content.js        — injecté dans les pages Wikipedia (extraction + conversion Markdown)
+├── lib/turndown.js   — conversion HTML → Markdown (vendored)
+├── popup.html/js     — popup barre d'outils (clé API + bouton Capturer)
+├── icons/            — icon16/48/128.png
+└── CLAUDE.md         — contexte de développement
 ```
+
+## Remerciements
+
+Merci à [@coddingtonbear](https://github.com/coddingtonbear) pour le projet
+[Obsidian Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api),
+qui expose ton vault Obsidian via une API REST locale sécurisée et un serveur
+Model Context Protocol (MCP) — permettant à n'importe quel agent IA (Claude,
+Cursor, ou ton propre script) d'interagir directement avec tes notes.

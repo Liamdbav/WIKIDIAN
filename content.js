@@ -17,7 +17,7 @@ console.log("Wikidian content script loaded.");
   const NOISE = ".mw-editsection, .navbox, .reference, .reflist, .hatnote, .ambox";
   clone.querySelectorAll(NOISE).forEach(el => el.remove());
 
-  const body = clone.innerText.trim();
+  const body = clone.textContent.trim();
 
   chrome.runtime.sendMessage({ type: "WIKI_CAPTURE", payload: { title, body, url } });
 })();

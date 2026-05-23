@@ -20,7 +20,8 @@ async function saveToObsidian({ title, body, url }) {
   const markdown = `# ${title}\n\n> Source : ${url}\n\n${body}`;
 
   try {
-    const res = await fetch(`${OBSIDIAN_BASE}/vault/${encodeURIComponent(notePath)}`, {
+    const encodedPath = notePath.split("/").map(encodeURIComponent).join("/");
+    const res = await fetch(`${OBSIDIAN_BASE}/vault/${encodedPath}`, {
       method: "PUT",
       headers: {
         "Authorization": `Bearer ${obsidianApiKey}`,

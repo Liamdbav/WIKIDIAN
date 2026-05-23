@@ -44,3 +44,6 @@ Merci à [@coddingtonbear](https://github.com/coddingtonbear) pour le projet
 qui expose ton vault Obsidian via une API REST locale sécurisée et un serveur
 Model Context Protocol (MCP) — permettant à n'importe quel agent IA (Claude,
 Cursor, ou ton propre script) d'interagir directement avec tes notes.
+
+Ce projet tourne sur ma propre reconstruction du plugin :
+[Liamdbav/OBSIDIAN-API-LOCAL](https://github.com/Liamdbav/OBSIDIAN-API-LOCAL).

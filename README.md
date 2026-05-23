@@ -6,7 +6,7 @@
 
 Extension Chromium Manifest V3 qui capture les articles Wikipedia que tu visites
 et les sauvegarde comme notes Markdown dans un vault [Obsidian](https://obsidian.md),
-via le plugin [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api).
+via le plugin [Local REST API](https://github.com/Liamdbav/OBSIDIAN-API-LOCAL). 
 
 ## Comment ça fonctionne
 

@@ -1,37 +1,27 @@
 console.log("Wikidian content script loaded.");
 
-(function capture() {
-  // Wikipedia marque les articles (namespace 0) avec la classe "ns-0" sur <body>.
-  // Les pages spéciales (Spécial:, Discussion:, etc.) ont d'autres classes — on les ignore.
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.type !== "TRIGGER_CAPTURE") return;
+
   if (!document.body.classList.contains("ns-0")) {
-    console.log("[Wikidian] Pas un article (namespace != 0), ignoré.");
-    return;
+    sendResponse({ error: "Pas un article Wikipedia." });
+    return true;
   }
 
   const titleEl = document.querySelector("#firstHeading");
-  if (!titleEl) { console.warn("[Wikidian] #firstHeading introuvable"); return; }
+  if (!titleEl) { sendResponse({ error: "#firstHeading introuvable." }); return true; }
   const title = titleEl.textContent.trim();
 
-  // URL propre : sans query params ni ancre
   const url = window.location.origin + window.location.pathname;
 
   const root = document.querySelector("#mw-content-text .mw-parser-output");
-  if (!root) { console.warn("[Wikidian] .mw-parser-output introuvable"); return; }
+  if (!root) { sendResponse({ error: ".mw-parser-output introuvable." }); return true; }
 
   const clone = root.cloneNode(true);
-  const NOISE = ".mw-editsection, .navbox, .reference, .reflist, .hatnote, .ambox";
-  clone.querySelectorAll(NOISE).forEach(el => el.remove());
+  clone.querySelectorAll(".mw-editsection, .navbox, .reference, .reflist, .hatnote, .ambox")
+       .forEach(el => el.remove());
 
   const body = clone.textContent.trim();
-  console.log("[Wikidian] Article détecté :", title, "— body :", body.length, "chars");
-
-  chrome.runtime.sendMessage({ type: "WIKI_CAPTURE", payload: { title, body, url } },
-    (response) => {
-      if (chrome.runtime.lastError) {
-        console.error("[Wikidian] sendMessage échoué :", chrome.runtime.lastError.message);
-      } else {
-        console.log("[Wikidian] Background a répondu :", response);
-      }
-    }
-  );
-})();
+  sendResponse({ title, body, url });
+  return true;
+});

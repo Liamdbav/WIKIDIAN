@@ -15,7 +15,7 @@
     }
     h1 {
       font-size: 1rem;
-      margin: 0 0 12px;
+      margin: 0 0 14px;
       color: #cba6f7;
     }
     label {
@@ -33,25 +33,41 @@
       background: #313244;
       color: #cdd6f4;
       font-size: 0.85rem;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 4px;
     }
     button {
-      width: 100%;
+      flex: 1;
       padding: 7px;
       border-radius: 6px;
       border: none;
-      background: #cba6f7;
-      color: #1e1e2e;
       font-weight: 600;
       cursor: pointer;
       font-size: 0.85rem;
     }
-    button:hover { background: #b4befe; }
+    #save {
+      background: #45475a;
+      color: #cdd6f4;
+    }
+    #save:hover { background: #585b70; }
+    #capture {
+      background: #cba6f7;
+      color: #1e1e2e;
+    }
+    #capture:hover { background: #b4befe; }
+    #capture:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
     #status {
       margin-top: 10px;
       font-size: 0.75rem;
       min-height: 1rem;
-      color: #a6e3a1;
+      word-break: break-word;
     }
   </style>
 </head>
@@ -59,7 +75,10 @@
   <h1>Wikidian</h1>
   <label for="apiKey">Obsidian REST API key</label>
   <input type="password" id="apiKey" placeholder="Paste your API key…" />
-  <button id="save">Save</button>
+  <div class="btn-row">
+    <button id="save">Save key</button>
+    <button id="capture">Capturer cette page</button>
+  </div>
   <div id="status"></div>
   <script src="popup.js"></script>
 </body>

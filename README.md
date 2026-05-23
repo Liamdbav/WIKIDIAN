@@ -14,7 +14,7 @@ via le plugin [Local REST API](https://github.com/coddingtonbear/obsidian-local-
 ## Prérequis
 
 - [Obsidian](https://obsidian.md) ouvert sur le bureau.
-- Plugin **Local REST API** installé, activé, et sa clé API copiée.
+- Plugin **[Liamdbav/OBSIDIAN-API-LOCAL](https://github.com/Liamdbav/OBSIDIAN-API-LOCAL)** installé et activé dans Obsidian — c'est ce plugin qui expose l'API REST locale utilisée par l'extension. Sans lui, Wikidian ne peut pas écrire dans ton vault.
 - Chrome ou Chromium (toute version récente supportant MV3).
 
 ## Charger l'extension dans Chrome

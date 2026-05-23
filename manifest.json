@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Capture Wikipedia articles and save them as Markdown notes in Obsidian via Local REST API.",
 
-  "permissions": ["storage", "activeTab", "tabs"],
+  "permissions": ["storage", "activeTab", "tabs", "scripting"],
 
   "host_permissions": [
     "*://*.wikipedia.org/*",

@@ -1,3 +1,5 @@
+if (window.__wikidianLoaded) return;
+window.__wikidianLoaded = true;
 console.log("Wikidian content script loaded.");
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {

@@ -40,8 +40,14 @@ captureBtn.addEventListener("click", async () => {
     try {
       payload = await chrome.tabs.sendMessage(tab.id, { type: "TRIGGER_CAPTURE" });
     } catch {
-      setStatus("Content script inaccessible — recharge la page Wikipedia.", "error");
-      return;
+      // Onglet ouvert avant le chargement de l'extension — on injecte à la volée
+      try {
+        await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["content.js"] });
+        payload = await chrome.tabs.sendMessage(tab.id, { type: "TRIGGER_CAPTURE" });
+      } catch (e) {
+        setStatus("Impossible d'injecter le script : " + e.message, "error");
+        return;
+      }
     }
 
     if (payload?.error) { setStatus(payload.error, "error"); return; }

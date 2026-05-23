@@ -1,11 +1,29 @@
-const keyInput  = document.getElementById("apiKey");
-const saveBtn   = document.getElementById("save");
+const keyInput   = document.getElementById("apiKey");
+const saveBtn    = document.getElementById("save");
 const captureBtn = document.getElementById("capture");
-const status    = document.getElementById("status");
+const status     = document.getElementById("status");
 
 function setStatus(text, type = "ok") {
   status.textContent = text;
   status.style.color = type === "ok" ? "#a6e3a1" : type === "error" ? "#f38ba8" : "#cdd6f4";
+}
+
+// Runs inside the Wikipedia tab — no closure over popup variables
+function extractArticle() {
+  if (!document.body.classList.contains("ns-0")) {
+    return { error: "Pas un article Wikipedia." };
+  }
+  const title = document.querySelector("#firstHeading")?.textContent.trim();
+  if (!title) return { error: "#firstHeading introuvable." };
+
+  const root = document.querySelector("#mw-content-text .mw-parser-output");
+  if (!root) return { error: ".mw-parser-output introuvable." };
+
+  const clone = root.cloneNode(true);
+  clone.querySelectorAll(".mw-editsection, .navbox, .reference, .reflist, .hatnote, .ambox")
+       .forEach(el => el.remove());
+
+  return { title, body: clone.textContent.trim(), url: location.origin + location.pathname };
 }
 
 // Load stored key on open
@@ -24,8 +42,6 @@ saveBtn.addEventListener("click", () => {
 
 captureBtn.addEventListener("click", async () => {
   captureBtn.disabled = true;
-  setStatus("Récupération de l'onglet…", "info");
-
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -38,16 +54,14 @@ captureBtn.addEventListener("click", async () => {
 
     let payload;
     try {
-      payload = await chrome.tabs.sendMessage(tab.id, { type: "TRIGGER_CAPTURE" });
-    } catch {
-      // Onglet ouvert avant le chargement de l'extension — on injecte à la volée
-      try {
-        await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["content.js"] });
-        payload = await chrome.tabs.sendMessage(tab.id, { type: "TRIGGER_CAPTURE" });
-      } catch (e) {
-        setStatus("Impossible d'injecter le script : " + e.message, "error");
-        return;
-      }
+      const [{ result }] = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: extractArticle,
+      });
+      payload = result;
+    } catch (e) {
+      setStatus("Extraction impossible : " + e.message, "error");
+      return;
     }
 
     if (payload?.error) { setStatus(payload.error, "error"); return; }
@@ -61,7 +75,6 @@ captureBtn.addEventListener("click", async () => {
     } else {
       setStatus(result?.error ?? "Erreur inconnue.", "error");
     }
-
   } finally {
     captureBtn.disabled = false;
   }

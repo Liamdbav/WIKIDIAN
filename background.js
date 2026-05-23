@@ -2,25 +2,29 @@ console.log("Wikidian background service worker started.");
 
 const OBSIDIAN_BASE = "http://127.0.0.1:27123";
 
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type !== "WIKI_CAPTURE") return;
-  saveToObsidian(message.payload);
+  console.log("[Wikidian] Message reçu :", message.payload.title);
+  saveToObsidian(message.payload).then(() => sendResponse("ok")).catch(() => sendResponse("error"));
+  return true; // maintient le canal ouvert pour la réponse async
 });
 
 async function saveToObsidian({ title, body, url }) {
   const { obsidianApiKey } = await chrome.storage.local.get("obsidianApiKey");
   if (!obsidianApiKey) {
-    console.warn("[Wikidian] No API key set — open the popup to configure it.");
+    console.warn("[Wikidian] Clé API absente — configure-la dans le popup.");
     return;
   }
+  console.log("[Wikidian] Clé API présente, envoi vers Obsidian…");
 
-  // Sanitize title for use as a filename (replace / to avoid path traversal)
-  const filename = title.replace(/\//g, "_");
-  const notePath = `Wikipedia/${filename}.md`;
-  const markdown = `# ${title}\n\n> Source : ${url}\n\n${body}`;
+  const filename    = title.replace(/\//g, "_");
+  const notePath    = `Wikipedia/${filename}.md`;
+  const encodedPath = notePath.split("/").map(encodeURIComponent).join("/");
+  const markdown    = `# ${title}\n\n> Source : ${url}\n\n${body}`;
+
+  console.log("[Wikidian] PUT", `${OBSIDIAN_BASE}/vault/${encodedPath}`);
 
   try {
-    const encodedPath = notePath.split("/").map(encodeURIComponent).join("/");
     const res = await fetch(`${OBSIDIAN_BASE}/vault/${encodedPath}`, {
       method: "PUT",
       headers: {
@@ -31,11 +35,11 @@ async function saveToObsidian({ title, body, url }) {
     });
 
     if (res.ok) {
-      console.log(`[Wikidian] Saved → ${notePath}`);
+      console.log(`[Wikidian] Sauvegardé → ${notePath}`);
     } else {
-      console.error(`[Wikidian] API error ${res.status}:`, await res.text());
+      console.error(`[Wikidian] Erreur API ${res.status} :`, await res.text());
     }
   } catch (err) {
-    console.error("[Wikidian] Failed to reach Obsidian REST API:", err.message);
+    console.error("[Wikidian] Impossible de joindre l'API Obsidian :", err.message);
   }
 }

@@ -14,9 +14,9 @@ chrome.storage.local.get("obsidianApiKey", ({ obsidianApiKey }) => {
 
 saveBtn.addEventListener("click", () => {
   const key = keyInput.value.trim();
-  if (!key) { setStatus("Key cannot be empty.", "error"); return; }
+  if (!key) { setStatus("La clé ne peut pas être vide.", "error"); return; }
   chrome.storage.local.set({ obsidianApiKey: key }, () => {
-    setStatus("Saved.");
+    setStatus("Clé sauvegardée.");
     setTimeout(() => { status.textContent = ""; }, 2000);
   });
 });

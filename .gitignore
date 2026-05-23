@@ -2,4 +2,7 @@ node_modules/
 .DS_Store
 *.log
 resize-extension.sh
+image.png
+AUDIT_REPORT.md
+.claude/
 

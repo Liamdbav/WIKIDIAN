@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="LOGO.png" alt="Wikidian" width="180" />
+</div>
+
 # Wikidian
 
 Extension Chromium Manifest V3 qui capture les articles Wikipedia que tu visites
@@ -7,7 +11,7 @@ via le plugin [Local REST API](https://github.com/coddingtonbear/obsidian-local-
 ## Comment ça fonctionne
 
 1. Tu cliques sur **"Capturer cette page"** depuis n'importe quel article Wikipedia.
-2. Le content script extrait le titre et convertit le corps de l'article en Markdown structuré (titres, liens, gras/italique) grâce à [Turndown](https://github.com/mixmark-io/turndown).
+2. Le content script extrait le titre, convertit l'infobox en tableau Markdown et le corps de l'article en Markdown structuré grâce à [Turndown](https://github.com/mixmark-io/turndown). Tous les liens internes sont supprimés — seul le lien source est conservé.
 3. Le service worker envoie la note à l'API Obsidian locale (`http://127.0.0.1:27123`).
 4. La note apparaît dans ton vault sous `Wikipedia/{Titre}.md`.
 
@@ -23,6 +27,8 @@ via le plugin [Local REST API](https://github.com/coddingtonbear/obsidian-local-
 2. Active le **Mode développeur** (interrupteur en haut à droite).
 3. Clique sur **Charger l'extension non empaquetée** et sélectionne ce dossier.
 4. Clique sur l'icône Wikidian dans la barre d'outils, colle ta clé API Obsidian et sauvegarde.
+
+> Après toute modification du code, recharge l'extension dans `chrome://extensions` **puis rafraîchis** (F5) la page Wikipedia avant de capturer.
 
 ## Structure du projet
 
@@ -47,3 +53,13 @@ Cursor, ou ton propre script) d'interagir directement avec tes notes.
 
 Ce projet tourne sur ma propre reconstruction du plugin :
 [Liamdbav/OBSIDIAN-API-LOCAL](https://github.com/Liamdbav/OBSIDIAN-API-LOCAL).
+
+---
+
+<div align="center">
+
+Fait avec soin par **Liam** - License MIT — voir [LICENSE](LICENSE)
+
+[![Follow on X](https://img.shields.io/badge/Follow-%40Liamdbav-000000?style=flat-square&logo=x&logoColor=white)](https://x.com/Liamdbav)
+
+</div>

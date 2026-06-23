@@ -68,8 +68,57 @@
     if (!root) { sendResponse({ error: ".mw-parser-output introuvable." }); return true; }
 
     const clone = root.cloneNode(true);
-    clone.querySelectorAll(".mw-editsection, .navbox, .reference, .reflist, .hatnote, .ambox")
-         .forEach(el => el.remove());
+
+    // Supprime les éléments parasites structurels
+    clone.querySelectorAll(
+      ".mw-editsection, .navbox, .reference, .reflist, .hatnote, .ambox, " +
+      ".thumb, .thumbinner, .thumbcaption, " +
+      ".bandeau-portail, .sistersitebox, .noprint, " +
+      ".mw-references-wrap, .mw-empty-elt, .locmap, .geobox"
+    ).forEach(el => el.remove());
+
+    // Supprime toutes les images (URLs protocol-relative inutilisables dans Obsidian)
+    clone.querySelectorAll("img, figure, figcaption").forEach(el => el.remove());
+
+    // frwiki enveloppe chaque heading dans <div class="mw-heading">.
+    // h.nextElementSibling est donc null — il faut marcher depuis le div parent.
+    function headingContainer(h) {
+      return h.closest(".mw-heading") || h;
+    }
+
+    // Supprime "Notes et références" et variantes (heading + contenu)
+    const SKIP_H2 = ["Notes et références", "Notes", "Références"];
+    clone.querySelectorAll("h2").forEach(h2 => {
+      const text = h2.textContent.trim().replace(/\[.*?\]/g, "").trim();
+      if (!SKIP_H2.includes(text)) return;
+      const container = headingContainer(h2);
+      const toRemove = [container];
+      let next = container.nextElementSibling;
+      while (next) {
+        if (next.querySelector("h2") || next.tagName === "H2") break;
+        toRemove.push(next);
+        next = next.nextElementSibling;
+      }
+      toRemove.forEach(e => e.remove());
+    });
+
+    // Marque les liens dans "Liens externes" et "Articles connexes" pour les rendre clicables.
+    // On marche depuis le div.mw-heading (pas depuis le h3 lui-même).
+    const KEEP_LINK_H = ["Voir aussi", "Annexes", "Liens externes", "Articles connexes"];
+    clone.querySelectorAll("h2, h3").forEach(h => {
+      const text = h.textContent.trim().replace(/\[.*?\]/g, "").trim();
+      if (!KEEP_LINK_H.some(s => text.includes(s))) return;
+      const container = headingContainer(h);
+      const level = parseInt(h.tagName[1]);
+      let next = container.nextElementSibling;
+      while (next) {
+        const nextH = next.querySelector("h1,h2,h3") ||
+                      (next.tagName && next.tagName.match(/^H[1-6]$/) ? next : null);
+        if (nextH && parseInt(nextH.tagName[1]) <= level) break;
+        next.querySelectorAll("a[href]").forEach(a => a.setAttribute("data-keep-link", "1"));
+        next = next.nextElementSibling;
+      }
+    });
 
     // Extraire les infoboxes (div, pas table) avant Turndown
     const infoboxMd = [];
@@ -86,10 +135,23 @@
       replacement: () => "",
     });
 
-    // Supprime tous les liens — garde uniquement le texte
+    // Supprime les liens dans le corps de l'article (trop nombreux, Wikipedia interne)
+    // mais conserve les liens marqués data-keep-link (Liens externes, Articles connexes)
     td.addRule("stripLinks", {
       filter: "a",
-      replacement: content => content,
+      replacement: (content, node) => {
+        if (node.getAttribute("data-keep-link") === "1") {
+          const href = node.href || node.getAttribute("href") || "";
+          if (href && content.trim()) return "[" + content.trim() + "](" + href + ")";
+        }
+        return content;
+      },
+    });
+
+    // Filet de sécurité : images/figures non supprimées par le DOM
+    td.addRule("stripImages", {
+      filter: ["img", "figure", "figcaption"],
+      replacement: () => "",
     });
 
     const articleBody = td.turndown(clone);
